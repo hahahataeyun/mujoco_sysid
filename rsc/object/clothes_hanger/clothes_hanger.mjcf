@@ -1,0 +1,28 @@
+<mujoco model="clothes_hanger">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <geom condim="3"
+          friction="1.2 0.01 0.001"
+          solref="0.02 1"
+          solimp="0.9 0.95 0.001"/>
+  </default>
+
+  <asset>
+    <mesh name="clothes_hanger_mesh" file="/home/capture15/shared_data/mesh_blender/clothes_hanger/clothes_hanger.obj"/>
+    <material name="clothes_hanger_material" rgba="0.75 0.08 0.05 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="clothes_hanger" pos="0 0 0">
+      <freejoint name="clothes_hanger_freejoint"/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001"/>
+      <geom name="clothes_hanger_geom"
+            type="mesh"
+            mesh="clothes_hanger_mesh"
+            material="clothes_hanger_material"
+            contype="1"
+            conaffinity="1"/>
+    </body>
+  </worldbody>
+</mujoco>

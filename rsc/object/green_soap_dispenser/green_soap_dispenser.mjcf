@@ -1,0 +1,17 @@
+<mujoco model="green_soap_dispenser">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="green_soap_dispenser_mesh" file="/home/capture15/shared_data/mesh_blender/green_soap_dispenser/green_soap_dispenser.obj" />
+    <material name="green_soap_dispenser_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="green_soap_dispenser" pos="0 0 0">
+      <freejoint name="green_soap_dispenser_freejoint" />
+      <inertial pos="0 0 0" mass="0.107" diaginertia="0.001 0.001 0.001" />
+      <geom name="green_soap_dispenser_geom" type="mesh" mesh="green_soap_dispenser_mesh" material="green_soap_dispenser_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

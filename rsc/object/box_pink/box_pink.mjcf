@@ -1,0 +1,17 @@
+<mujoco model="box_pink">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="box_pink_mesh" file="/home/capture15/shared_data/mesh_blender/box_pink/box_pink.obj" />
+    <material name="box_pink_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="box_pink" pos="0 0 0">
+      <freejoint name="box_pink_freejoint" />
+      <inertial pos="0 0 0" mass="0.201" diaginertia="0.001 0.001 0.001" />
+      <geom name="box_pink_geom" type="mesh" mesh="box_pink_mesh" material="box_pink_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,0 +1,17 @@
+<mujoco model="wood_organizer">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="wood_organizer_mesh" file="/home/capture15/shared_data/mesh_blender/wood_organizer/wood_organizer.obj" />
+    <material name="wood_organizer_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="wood_organizer" pos="0 0 0">
+      <freejoint name="wood_organizer_freejoint" />
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001" />
+      <geom name="wood_organizer_geom" type="mesh" mesh="wood_organizer_mesh" material="wood_organizer_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

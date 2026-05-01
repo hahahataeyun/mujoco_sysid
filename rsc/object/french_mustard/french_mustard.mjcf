@@ -1,0 +1,17 @@
+<mujoco model="french_mustard">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="french_mustard_mesh" file="/home/capture15/shared_data/mesh_blender/french_mustard/french_mustard.obj" />
+    <material name="french_mustard_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="french_mustard" pos="0 0 0">
+      <freejoint name="french_mustard_freejoint" />
+      <inertial pos="0 0 0" mass="0.046" diaginertia="0.001 0.001 0.001" />
+      <geom name="french_mustard_geom" type="mesh" mesh="french_mustard_mesh" material="french_mustard_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,0 +1,28 @@
+<mujoco model="metal_measuring_flask">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <geom condim="3"
+          friction="1.2 0.01 0.001"
+          solref="0.02 1"
+          solimp="0.9 0.95 0.001"/>
+  </default>
+
+  <asset>
+    <mesh name="metal_measuring_flask_mesh" file="/home/capture15/shared_data/mesh_blender/metal_measuring_flask/metal_measuring_flask.obj"/>
+    <material name="metal_measuring_flask_material" rgba="0.75 0.08 0.05 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="metal_measuring_flask" pos="0 0 0">
+      <freejoint name="metal_measuring_flask_freejoint"/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001"/>
+      <geom name="metal_measuring_flask_geom"
+            type="mesh"
+            mesh="metal_measuring_flask_mesh"
+            material="metal_measuring_flask_material"
+            contype="1"
+            conaffinity="1"/>
+    </body>
+  </worldbody>
+</mujoco>

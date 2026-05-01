@@ -1,0 +1,17 @@
+<mujoco model="washing_brush">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="washing_brush_mesh" file="/home/capture15/shared_data/mesh_blender/washing_brush/washing_brush.obj" />
+    <material name="washing_brush_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="washing_brush" pos="0 0 0">
+      <freejoint name="washing_brush_freejoint" />
+      <inertial pos="0 0 0" mass="0.076" diaginertia="0.001 0.001 0.001" />
+      <geom name="washing_brush_geom" type="mesh" mesh="washing_brush_mesh" material="washing_brush_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

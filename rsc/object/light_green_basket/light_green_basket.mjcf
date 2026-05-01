@@ -1,0 +1,17 @@
+<mujoco model="light_green_basket">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="light_green_basket_mesh" file="/home/capture15/shared_data/mesh_blender/light_green_basket/light_green_basket.obj" />
+    <material name="light_green_basket_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="light_green_basket" pos="0 0 0">
+      <freejoint name="light_green_basket_freejoint" />
+      <inertial pos="0 0 0" mass="0.246" diaginertia="0.001 0.001 0.001" />
+      <geom name="light_green_basket_geom" type="mesh" mesh="light_green_basket_mesh" material="light_green_basket_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

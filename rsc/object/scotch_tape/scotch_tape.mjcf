@@ -1,0 +1,28 @@
+<mujoco model="scotch_tape">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <geom condim="3"
+          friction="1.2 0.01 0.001"
+          solref="0.02 1"
+          solimp="0.9 0.95 0.001"/>
+  </default>
+
+  <asset>
+    <mesh name="scotch_tape_mesh" file="/home/capture15/shared_data/mesh_blender/scotch_tape/scotch_tape.obj"/>
+    <material name="scotch_tape_material" rgba="0.75 0.08 0.05 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="scotch_tape" pos="0 0 0">
+      <freejoint name="scotch_tape_freejoint"/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001"/>
+      <geom name="scotch_tape_geom"
+            type="mesh"
+            mesh="scotch_tape_mesh"
+            material="scotch_tape_material"
+            contype="1"
+            conaffinity="1"/>
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,0 +1,17 @@
+<mujoco model="pastel_blue_cup">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="pastel_blue_cup_mesh" file="/home/capture15/shared_data/mesh_blender/pastel_blue_cup/pastel_blue_cup.obj" />
+    <material name="pastel_blue_cup_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="pastel_blue_cup" pos="0 0 0">
+      <freejoint name="pastel_blue_cup_freejoint" />
+      <inertial pos="0 0 0" mass="0.029" diaginertia="0.001 0.001 0.001" />
+      <geom name="pastel_blue_cup_geom" type="mesh" mesh="pastel_blue_cup_mesh" material="pastel_blue_cup_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

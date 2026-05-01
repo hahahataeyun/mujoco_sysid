@@ -1,0 +1,17 @@
+<mujoco model="pringles_small">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="pringles_small_mesh" file="/home/capture15/shared_data/mesh_blender/pringles_small/pringles_small.obj" />
+    <material name="pringles_small_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="pringles_small" pos="0 0 0">
+      <freejoint name="pringles_small_freejoint" />
+      <inertial pos="0 0 0" mass="0.021" diaginertia="0.001 0.001 0.001" />
+      <geom name="pringles_small_geom" type="mesh" mesh="pringles_small_mesh" material="pringles_small_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

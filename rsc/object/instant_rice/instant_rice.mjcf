@@ -1,0 +1,28 @@
+<mujoco model="instant_rice">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <geom condim="3"
+          friction="1.2 0.01 0.001"
+          solref="0.02 1"
+          solimp="0.9 0.95 0.001"/>
+  </default>
+
+  <asset>
+    <mesh name="instant_rice_mesh" file="/home/capture15/shared_data/mesh_blender/instant_rice/instant_rice.obj"/>
+    <material name="instant_rice_material" rgba="0.75 0.08 0.05 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="instant_rice" pos="0 0 0">
+      <freejoint name="instant_rice_freejoint"/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001"/>
+      <geom name="instant_rice_geom"
+            type="mesh"
+            mesh="instant_rice_mesh"
+            material="instant_rice_material"
+            contype="1"
+            conaffinity="1"/>
+    </body>
+  </worldbody>
+</mujoco>

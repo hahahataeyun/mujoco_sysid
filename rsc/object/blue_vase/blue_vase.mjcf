@@ -1,0 +1,17 @@
+<mujoco model="blue_vase">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="blue_vase_mesh" file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase.obj" />
+    <material name="blue_vase_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="blue_vase" pos="0 0 0">
+      <freejoint name="blue_vase_freejoint" />
+      <inertial pos="0 0 0" mass="0.279" diaginertia="0.001 0.001 0.001" />
+      <geom name="blue_vase_geom" type="mesh" mesh="blue_vase_mesh" material="blue_vase_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

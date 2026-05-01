@@ -1,0 +1,17 @@
+<mujoco model="tea_case">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="tea_case_mesh" file="/home/capture15/shared_data/mesh_blender/tea_case/tea_case.obj" />
+    <material name="tea_case_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="tea_case" pos="0 0 0">
+      <freejoint name="tea_case_freejoint" />
+      <inertial pos="0 0 0" mass="0.101" diaginertia="0.001 0.001 0.001" />
+      <geom name="tea_case_geom" type="mesh" mesh="tea_case_mesh" material="tea_case_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,8 +1,9 @@
-"""Kinematic replay for robot qpos and tracked object placement.
+"""Replay robot qpos with either tracked or dynamic object placement.
 
-The script directly writes synchronized recorded arm/hand motion into robot
-qpos and the tracked object trajectory into the object's freejoint qpos, then
-calls ``mj_forward``. It does not step physics.
+Kinematic mode writes synchronized recorded arm/hand motion and tracked object
+poses directly into qpos. Dynamic mode writes the object pose only at the first
+timestep, then lets MuJoCo contact dynamics move the object while the robot
+follows the recorded arm/hand motion.
 """
 
 from __future__ import annotations
@@ -30,6 +31,9 @@ OBJECT_BODY = "tracked_object"
 OBJECT_GEOM = "tracked_object_geom"
 OBJECT_FREEJOINT = "tracked_object_freejoint"
 SUPPORT_PLANE_GEOM = "support_plane"
+KINEMATIC_SUPPORT_PLANE_OFFSET = -0.002
+DYNAMIC_SUPPORT_PLANE_OFFSET = 0.0
+RESTART_KEY = ord("R")
 
 ARM_ACTUATORS = ("joint1", "joint2", "joint3", "joint4", "joint5", "joint6")
 HAND_ACTUATORS = (
@@ -65,6 +69,7 @@ class SceneInfo:
     object_geom_id: int
     object_qposadr: int
     joint_qposadr: dict[str, int]
+    joint_dofadr: dict[str, int]
     initial_qpos: np.ndarray
     initial_ctrl: np.ndarray
 
@@ -85,18 +90,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stride", type=int, default=1)
     parser.add_argument("--speed", type=float, default=1.0)
     parser.add_argument("--loop", action="store_true")
-    parser.add_argument("--mode", choices=("kinematic",), default="kinematic")
-    parser.add_argument("--hand-command-min", type=float, default=1000.0)
-    parser.add_argument("--hand-command-max", type=float, default=2000.0)
-    parser.add_argument("--apply-c2r", dest="apply_c2r", action="store_true", default=True)
-    parser.add_argument("--no-apply-c2r", dest="apply_c2r", action="store_false")
-    parser.add_argument("--direct-c2r", action="store_true", default=True)
-    parser.add_argument("--inverse-c2r", dest="direct_c2r", action="store_false")
+    parser.add_argument("--mode", choices=("kinematic", "dynamic"), default="kinematic")
     parser.add_argument("--support-plane", action="store_true")
     parser.add_argument("--support-plane-z", type=float, default=None)
     parser.add_argument("--print-every", type=int, default=30)
     parser.add_argument("--headless", action="store_true")
-    parser.add_argument("--print-camera-pose", action="store_true")
+    parser.add_argument("--visualize-contacts", action="store_true")
     return parser.parse_args()
 
 
@@ -244,8 +243,6 @@ def load_object_trajectory(
     sequence_dir: Path,
     npz_path: Path | None,
     pose_dir: Path | None,
-    apply_c2r: bool,
-    direct_c2r: bool,
 ) -> tuple[np.ndarray, np.ndarray]:
     if pose_dir is not None:
         pose_files = sorted(pose_dir.glob("pose_*.txt"))
@@ -268,25 +265,35 @@ def load_object_trajectory(
 
     if transforms.shape[1:] != (4, 4):
         raise ValueError(f"Expected object poses shaped Nx4x4, got {transforms.shape}")
-    if apply_c2r:
-        c2r_path = sequence_dir / "C2R.npy"
-        if not c2r_path.exists():
-            raise FileNotFoundError(f"--apply-c2r requested, but {c2r_path} is missing")
-        c2r = np.load(c2r_path)
-        if direct_c2r:
-            transforms = np.einsum("ij,njk->nik", c2r, transforms)
-        else:
-            transforms = np.einsum("ij,njk->nik", np.linalg.inv(c2r), transforms)
+    c2r_path = sequence_dir / "C2R.npy"
+    if not c2r_path.exists():
+        raise FileNotFoundError(f"Missing camera-to-robot transform: {c2r_path}")
+    c2r = np.load(c2r_path)
+    transforms = np.einsum("ij,njk->nik", np.linalg.inv(c2r), transforms)
 
     return frame_ids, transforms_to_qpos(transforms)
 
 
-def command_to_hand_ctrl(
-    commands: np.ndarray, ctrlrange: np.ndarray, command_min: float, command_max: float
-) -> np.ndarray:
-    scale = (commands - command_min) / (command_max - command_min)
-    scale = np.clip(scale, 0.0, 1.0)
-    return ctrlrange[:, 0] + scale * (ctrlrange[:, 1] - ctrlrange[:, 0])
+def inspire_f1_action_to_hand_ctrl(action: np.ndarray, ctrlrange: np.ndarray) -> np.ndarray:
+    """Convert Inspire F1 raw hand action to MJCF actuator order in radians.
+
+    Raw action order is:
+      little, ring, middle, index, thumb_2, thumb_1
+
+    MJCF actuator order is:
+      thumb_1, thumb_2, index, middle, ring, little
+    """
+    action = np.asarray(action, dtype=np.float64)
+    qpos_raw_order = np.zeros_like(action, dtype=np.float64)
+    qpos_raw_order[:, 0] = (1800.0 - action[:, 0]) * np.pi / 1800.0
+    qpos_raw_order[:, 1] = (1350.0 - action[:, 1]) * np.pi / 1800.0
+    qpos_raw_order[:, 2] = (1740.0 - action[:, 2]) * np.pi / 1800.0
+    qpos_raw_order[:, 3] = (1740.0 - action[:, 3]) * np.pi / 1800.0
+    qpos_raw_order[:, 4] = (1740.0 - action[:, 4]) * np.pi / 1800.0
+    qpos_raw_order[:, 5] = (1740.0 - action[:, 5]) * np.pi / 1800.0
+
+    hand_ctrl = qpos_raw_order
+    return np.clip(hand_ctrl, ctrlrange[:, 0], ctrlrange[:, 1])
 
 
 def load_sequence(
@@ -307,8 +314,6 @@ def load_sequence(
         sequence_dir,
         object_pose_npz,
         pose_dir,
-        args.apply_c2r,
-        args.direct_c2r,
     )
     object_times = object_times_from_frames(
         sequence_dir,
@@ -325,9 +330,7 @@ def load_sequence(
 
     ctrlrange = model.actuator_ctrlrange.copy()
     arm_ctrl = np.clip(arm_sync, ctrlrange[:6, 0], ctrlrange[:6, 1])
-    hand_ctrl = command_to_hand_ctrl(
-        hand_sync, ctrlrange[6:12], args.hand_command_min, args.hand_command_max
-    )
+    hand_ctrl = inspire_f1_action_to_hand_ctrl(hand_sync, ctrlrange[6:12])
     controls = np.concatenate([arm_ctrl, hand_ctrl], axis=1)
 
     keep = np.arange(len(object_qpos))
@@ -365,11 +368,13 @@ def read_obj_vertices(mesh_path: Path) -> np.ndarray:
     return np.asarray(vertices, dtype=np.float64)
 
 
-def infer_support_plane_z(object_mesh: Path, object_qpos: np.ndarray) -> float:
+def infer_support_plane_z(
+    object_mesh: Path, object_qpos: np.ndarray, plane_offset: float
+) -> float:
     vertices = read_obj_vertices(object_mesh)
     rotation = wxyz_to_rotation(object_qpos[3:])
     world_vertices = vertices @ rotation.T + object_qpos[:3]
-    return float(np.min(world_vertices[:, 2]) - 0.002)
+    return float(np.min(world_vertices[:, 2]) + plane_offset)
 
 
 def build_combined_model(
@@ -378,8 +383,12 @@ def build_combined_model(
     initial_object_qpos: np.ndarray,
     add_support_plane: bool,
     support_plane_z: float | None,
+    physics_enabled: bool,
 ) -> mujoco.MjModel:
     root = ET.parse(robot_xml).getroot()
+    option = root.find("option")
+    if option is not None and physics_enabled:
+        option.set("iterations", "100")
 
     for mesh_node in root.find("asset").findall("mesh"):
         mesh_file = mesh_node.attrib.get("file")
@@ -393,10 +402,15 @@ def build_combined_model(
     ET.SubElement(root.find("asset"), "mesh", name="tracked_object_mesh", file=str(object_mesh))
 
     if add_support_plane:
+        plane_offset = (
+            DYNAMIC_SUPPORT_PLANE_OFFSET
+            if physics_enabled
+            else KINEMATIC_SUPPORT_PLANE_OFFSET
+        )
         plane_z = (
             support_plane_z
             if support_plane_z is not None
-            else infer_support_plane_z(object_mesh, initial_object_qpos)
+            else infer_support_plane_z(object_mesh, initial_object_qpos, plane_offset)
         )
         ET.SubElement(
             worldbody,
@@ -406,8 +420,12 @@ def build_combined_model(
             pos=f"0 0 {plane_z}",
             size="0.8 0.8 0.02",
             friction="1.0 0.005 0.0001",
-            contype="0",
-            conaffinity="0",
+            condim="3",
+            margin="0.001" if physics_enabled else "0",
+            solref="0.001 1" if physics_enabled else "0.02 1",
+            solimp="0.99 0.995 0.0001" if physics_enabled else "0.9 0.95 0.001",
+            contype="4" if physics_enabled else "0",
+            conaffinity="2" if physics_enabled else "0",
             rgba="0.35 0.35 0.35 0.25",
         )
 
@@ -426,9 +444,13 @@ def build_combined_model(
         type="mesh",
         mesh="tracked_object_mesh",
         mass="0.2",
-        contype="0",
-        conaffinity="0",
+        friction="1.2 0.01 0.001",
+        margin="0.001" if physics_enabled else "0",
+        contype="2" if physics_enabled else "0",
+        conaffinity="5" if physics_enabled else "0",
         condim="3",
+        solref="0.001 1" if physics_enabled else "0.02 1",
+        solimp="0.99 0.995 0.0001" if physics_enabled else "0.9 0.95 0.001",
         rgba="0.78 0.65 0.42 1",
     )
 
@@ -445,8 +467,9 @@ def name_to_id(model: mujoco.MjModel, obj_type: mujoco.mjtObj, name: str) -> int
 
 def make_initial_state(
     model: mujoco.MjModel, first_ctrl: np.ndarray, first_object_qpos: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, dict[str, int]]:
+) -> tuple[np.ndarray, np.ndarray, dict[str, int], dict[str, int]]:
     joint_qposadr = {}
+    joint_dofadr = {}
     qpos = np.zeros(model.nq, dtype=np.float64)
 
     for joint_name in ARM_ACTUATORS + HAND_ACTUATORS:
@@ -455,19 +478,21 @@ def make_initial_state(
         actuator_id = name_to_id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, joint_name)
         qpos[qposadr] = first_ctrl[actuator_id]
         joint_qposadr[joint_name] = qposadr
+        joint_dofadr[joint_name] = model.jnt_dofadr[joint_id]
 
     for joint_name, (parent_name, gain) in COUPLED_JOINTS.items():
         joint_id = name_to_id(model, mujoco.mjtObj.mjOBJ_JOINT, joint_name)
         qposadr = model.jnt_qposadr[joint_id]
         qpos[qposadr] = gain * qpos[joint_qposadr[parent_name]]
         joint_qposadr[joint_name] = qposadr
+        joint_dofadr[joint_name] = model.jnt_dofadr[joint_id]
 
     freejoint_id = name_to_id(model, mujoco.mjtObj.mjOBJ_JOINT, OBJECT_FREEJOINT)
     object_qposadr = model.jnt_qposadr[freejoint_id]
     qpos[object_qposadr : object_qposadr + 7] = first_object_qpos
 
     ctrl = np.clip(first_ctrl, model.actuator_ctrlrange[:, 0], model.actuator_ctrlrange[:, 1])
-    return qpos, ctrl, joint_qposadr
+    return qpos, ctrl, joint_qposadr, joint_dofadr
 
 
 def build_scene(args: argparse.Namespace) -> tuple[SceneInfo, SequenceData]:
@@ -479,25 +504,31 @@ def build_scene(args: argparse.Namespace) -> tuple[SceneInfo, SequenceData]:
         sequence_dir,
         object_pose_npz,
         pose_dir,
-        args.apply_c2r,
-        args.direct_c2r,
     )
+    physics_enabled = args.mode == "dynamic"
+    add_support_plane = args.support_plane or physics_enabled
     model = build_combined_model(
         args.robot_xml.resolve(),
         object_mesh,
         all_object_qpos[0],
-        args.support_plane,
+        add_support_plane,
         args.support_plane_z,
+        physics_enabled,
     )
     sequence = load_sequence(args, model, sequence_dir, object_pose_npz, pose_dir)
 
-    if args.support_plane and args.support_plane_z is None:
+    if add_support_plane and args.support_plane_z is None:
+        plane_offset = (
+            DYNAMIC_SUPPORT_PLANE_OFFSET
+            if physics_enabled
+            else KINEMATIC_SUPPORT_PLANE_OFFSET
+        )
         support_plane_id = name_to_id(model, mujoco.mjtObj.mjOBJ_GEOM, SUPPORT_PLANE_GEOM)
         model.geom_pos[support_plane_id, 2] = infer_support_plane_z(
-            object_mesh, sequence.object_qpos[0]
+            object_mesh, sequence.object_qpos[0], plane_offset
         )
 
-    initial_qpos, initial_ctrl, joint_qposadr = make_initial_state(
+    initial_qpos, initial_ctrl, joint_qposadr, joint_dofadr = make_initial_state(
         model, sequence.controls[0], sequence.object_qpos[0]
     )
     object_body_id = name_to_id(model, mujoco.mjtObj.mjOBJ_BODY, OBJECT_BODY)
@@ -511,34 +542,12 @@ def build_scene(args: argparse.Namespace) -> tuple[SceneInfo, SequenceData]:
             object_geom_id=object_geom_id,
             object_qposadr=model.jnt_qposadr[freejoint_id],
             joint_qposadr=joint_qposadr,
+            joint_dofadr=joint_dofadr,
             initial_qpos=initial_qpos,
             initial_ctrl=initial_ctrl,
         ),
         sequence,
     )
-
-
-def print_camera_to_robot_check(args: argparse.Namespace, frame_id: int) -> None:
-    sequence_dir = resolve_sequence_dir(args)
-    pose_dir = resolve_pose_dir(args, sequence_dir)
-    if pose_dir is None:
-        print("No pose_*.txt directory found for camera pose check")
-        return
-    c2r_path = sequence_dir / "C2R.npy"
-    pose_path = pose_dir / f"pose_{int(frame_id):06d}.txt"
-    if not pose_path.exists():
-        print(f"{pose_path} missing")
-        return
-    camera_object = np.loadtxt(pose_path, dtype=np.float64)
-    c2r = np.load(c2r_path)
-    direct_object = c2r @ camera_object
-    visualizer_object = np.linalg.inv(c2r) @ camera_object
-    print("camera/world object pose check")
-    print(f"  visualize_all.py formula: T_robot_object = inv(C2R) @ T_capture_object")
-    print(f"  pose file: {pose_path}")
-    print(f"  camera object xyz: {np.array2string(camera_object[:3, 3], precision=5)}")
-    print(f"  inv(C2R) @ camera object xyz: {np.array2string(visualizer_object[:3, 3], precision=5)}")
-    print(f"  C2R @ camera object xyz: {np.array2string(direct_object[:3, 3], precision=5)}")
 
 
 def set_robot_qpos_from_ctrl(scene, data: mujoco.MjData, ctrl: np.ndarray) -> None:
@@ -549,6 +558,22 @@ def set_robot_qpos_from_ctrl(scene, data: mujoco.MjData, ctrl: np.ndarray) -> No
     for joint_name, (parent_name, gain) in COUPLED_JOINTS.items():
         data.qpos[scene.joint_qposadr[joint_name]] = (
             gain * data.qpos[scene.joint_qposadr[parent_name]]
+        )
+
+
+def set_robot_qvel_from_ctrl_delta(
+    scene, data: mujoco.MjData, ctrl_delta: np.ndarray, dt: float
+) -> None:
+    if dt <= 0:
+        return
+
+    joint_names = ARM_ACTUATORS + HAND_ACTUATORS
+    for actuator_index, joint_name in enumerate(joint_names):
+        data.qvel[scene.joint_dofadr[joint_name]] = ctrl_delta[actuator_index] / dt
+
+    for joint_name, (parent_name, gain) in COUPLED_JOINTS.items():
+        data.qvel[scene.joint_dofadr[joint_name]] = (
+            gain * data.qvel[scene.joint_dofadr[parent_name]]
         )
 
 
@@ -591,14 +616,72 @@ def run_headless(scene, sequence, mode: str, print_every: int) -> None:
             print_debug_frame(scene, sequence, data, i, "kinematic", True)
 
 
+def initialize_dynamic_data(scene, sequence) -> mujoco.MjData:
+    data = mujoco.MjData(scene.model)
+    data.qpos[:] = scene.initial_qpos
+    data.qvel[:] = 0.0
+    data.ctrl[:] = sequence.controls[0]
+    set_robot_qpos_from_ctrl(scene, data, sequence.controls[0])
+    data.qpos[scene.object_qposadr : scene.object_qposadr + 7] = sequence.object_qpos[0]
+    mujoco.mj_forward(scene.model, data)
+    return data
+
+
+def step_dynamic_frame(
+    scene,
+    sequence,
+    data: mujoco.MjData,
+    index: int,
+    previous_ctrl: np.ndarray,
+) -> None:
+    dt = sequence.dt
+    sim_steps = max(1, int(round(dt / scene.model.opt.timestep)))
+    current_ctrl = sequence.controls[index]
+    ctrl_delta = current_ctrl - previous_ctrl
+
+    for step in range(sim_steps):
+        alpha = float(step + 1) / float(sim_steps)
+        ctrl = previous_ctrl + alpha * ctrl_delta
+        data.ctrl[:] = ctrl
+        set_robot_qpos_from_ctrl(scene, data, ctrl)
+        set_robot_qvel_from_ctrl_delta(scene, data, ctrl_delta, dt)
+        mujoco.mj_step(scene.model, data)
+
+
+def run_dynamic_headless(scene, sequence, print_every: int) -> None:
+    data = initialize_dynamic_data(scene, sequence)
+    print_debug_frame(scene, sequence, data, 0, "dynamic", False)
+    previous_ctrl = sequence.controls[0]
+    for i in range(1, len(sequence.frame_ids)):
+        step_dynamic_frame(scene, sequence, data, i, previous_ctrl)
+        previous_ctrl = sequence.controls[i]
+        if i == len(sequence.frame_ids) - 1 or i % print_every == 0:
+            print_debug_frame(scene, sequence, data, i, "dynamic", False)
+
+
+def make_restart_callback(restart_state: dict[str, bool]):
+    def key_callback(keycode: int) -> None:
+        if keycode == RESTART_KEY:
+            restart_state["requested"] = True
+            print("restart requested")
+
+    return key_callback
+
+
 def play_kinematic(scene, sequence, args: argparse.Namespace) -> None:
     data = mujoco.MjData(scene.model)
     wall_dt = sequence.dt / max(args.speed, 1e-6)
+    restart_state = {"requested": False}
 
-    with mujoco.viewer.launch_passive(scene.model, data) as viewer:
+    with mujoco.viewer.launch_passive(
+        scene.model,
+        data,
+        key_callback=make_restart_callback(restart_state),
+    ) as viewer:
         while viewer.is_running():
+            restart_state["requested"] = False
             for i in range(len(sequence.frame_ids)):
-                if not viewer.is_running():
+                if not viewer.is_running() or restart_state["requested"]:
                     break
                 frame_start = time.time()
                 set_kinematic_frame(scene, sequence, data, i)
@@ -608,10 +691,68 @@ def play_kinematic(scene, sequence, args: argparse.Namespace) -> None:
                 sleep_time = wall_dt - (time.time() - frame_start)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
+            if restart_state["requested"]:
+                continue
             if not args.loop:
                 while viewer.is_running():
+                    if restart_state["requested"]:
+                        break
                     viewer.sync()
                     time.sleep(0.03)
+                if restart_state["requested"]:
+                    continue
+                break
+
+
+def play_dynamic(scene, sequence, args: argparse.Namespace) -> None:
+    wall_dt = sequence.dt / max(args.speed, 1e-6)
+    data = initialize_dynamic_data(scene, sequence)
+    restart_state = {"requested": False}
+
+    with mujoco.viewer.launch_passive(
+        scene.model,
+        data,
+        key_callback=make_restart_callback(restart_state),
+    ) as viewer:
+        while viewer.is_running():
+            restart_state["requested"] = False
+
+            if args.visualize_contacts:
+                viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONVEXHULL] = 1
+                # viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = 1
+                viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTFORCE] = 1
+            data.qpos[:] = scene.initial_qpos
+            data.qvel[:] = 0.0
+            data.ctrl[:] = sequence.controls[0]
+            set_robot_qpos_from_ctrl(scene, data, sequence.controls[0])
+            data.qpos[scene.object_qposadr : scene.object_qposadr + 7] = sequence.object_qpos[0]
+            mujoco.mj_forward(scene.model, data)
+            viewer.sync()
+            print_debug_frame(scene, sequence, data, 0, "dynamic", False)
+
+            previous_ctrl = sequence.controls[0]
+            for i in range(1, len(sequence.frame_ids)):
+                if not viewer.is_running() or restart_state["requested"]:
+                    break
+                frame_start = time.time()
+                step_dynamic_frame(scene, sequence, data, i, previous_ctrl)
+                previous_ctrl = sequence.controls[i]
+                viewer.sync()
+                if i == len(sequence.frame_ids) - 1 or i % args.print_every == 0:
+                    print_debug_frame(scene, sequence, data, i, "dynamic", False)
+                sleep_time = wall_dt - (time.time() - frame_start)
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
+            if restart_state["requested"]:
+                continue
+            if not args.loop:
+                while viewer.is_running():
+                    if restart_state["requested"]:
+                        break
+                    viewer.sync()
+                    time.sleep(0.03)
+                if restart_state["requested"]:
+                    continue
                 break
 
 
@@ -627,24 +768,25 @@ def main() -> None:
         f"object={args.object_name} episode={args.episode_number} "
         f"sequence_dir={sequence_dir} "
         f"object_trajectory={object_source} "
-        f"mode=kinematic apply_c2r={args.apply_c2r} "
-        f"direct_c2r={args.direct_c2r} "
+        f"mode={args.mode} object_transform=inv(C2R) "
         f"frames={int(sequence.frame_ids[0])}..{int(sequence.frame_ids[-1])} "
         f"n={len(sequence.frame_ids)} dt={sequence.dt:.4f}s"
     )
-    if args.apply_c2r and args.direct_c2r:
-        print("robot is fixed in the MuJoCo world; object pose is C2R @ object_seq[t]")
-    elif args.apply_c2r:
-        print("robot is fixed in the MuJoCo world; object pose is inv(C2R) @ object_seq[t]")
+    if args.mode == "dynamic":
+        print("object pose is initialized from inv(C2R) @ object_seq[0], then simulated with contacts")
+        print("support plane is forced on in dynamic mode")
     else:
-        print("robot is fixed in the MuJoCo world; object pose is raw object_seq[t]")
+        print("robot is fixed in the MuJoCo world; object pose is inv(C2R) @ object_seq[t]")
     print(f"first object qpos={np.array2string(sequence.object_qpos[0], precision=5)}")
     print(f"first robot ctrl={np.array2string(sequence.controls[0], precision=5)}")
-    if args.print_camera_pose:
-        print_camera_to_robot_check(args, int(sequence.frame_ids[0]))
 
     if args.headless:
-        run_headless(scene, sequence, args.mode, args.print_every)
+        if args.mode == "dynamic":
+            run_dynamic_headless(scene, sequence, args.print_every)
+        else:
+            run_headless(scene, sequence, args.mode, args.print_every)
+    elif args.mode == "dynamic":
+        play_dynamic(scene, sequence, args)
     else:
         play_kinematic(scene, sequence, args)
 

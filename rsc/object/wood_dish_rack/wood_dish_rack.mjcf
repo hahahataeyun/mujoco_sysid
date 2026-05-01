@@ -1,0 +1,28 @@
+<mujoco model="wood_dish_rack">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <geom condim="3"
+          friction="1.2 0.01 0.001"
+          solref="0.02 1"
+          solimp="0.9 0.95 0.001"/>
+  </default>
+
+  <asset>
+    <mesh name="wood_dish_rack_mesh" file="/home/capture15/shared_data/mesh_blender/wood_dish_rack/wood_dish_rack.obj"/>
+    <material name="wood_dish_rack_material" rgba="0.75 0.08 0.05 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="wood_dish_rack" pos="0 0 0">
+      <freejoint name="wood_dish_rack_freejoint"/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001"/>
+      <geom name="wood_dish_rack_geom"
+            type="mesh"
+            mesh="wood_dish_rack_mesh"
+            material="wood_dish_rack_material"
+            contype="1"
+            conaffinity="1"/>
+    </body>
+  </worldbody>
+</mujoco>

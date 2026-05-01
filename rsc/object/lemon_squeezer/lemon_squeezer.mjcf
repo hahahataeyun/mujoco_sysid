@@ -1,0 +1,17 @@
+<mujoco model="lemon_squeezer">
+  <compiler angle="radian" autolimits="true" />
+  <default>
+    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+  </default>
+  <asset>
+    <mesh name="lemon_squeezer_mesh" file="/home/capture15/shared_data/mesh_blender/lemon_squeezer/lemon_squeezer.obj" />
+    <material name="lemon_squeezer_material" rgba="0.75 0.08 0.05 1" />
+  </asset>
+  <worldbody>
+    <body name="lemon_squeezer" pos="0 0 0">
+      <freejoint name="lemon_squeezer_freejoint" />
+      <inertial pos="0 0 0" mass="0.062" diaginertia="0.001 0.001 0.001" />
+      <geom name="lemon_squeezer_geom" type="mesh" mesh="lemon_squeezer_mesh" material="lemon_squeezer_material" contype="1" conaffinity="1" />
+    </body>
+  </worldbody>
+</mujoco>

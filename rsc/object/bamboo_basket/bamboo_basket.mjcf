@@ -1,0 +1,28 @@
+<mujoco model="bamboo_basket">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <geom condim="3"
+          friction="1.2 0.01 0.001"
+          solref="0.02 1"
+          solimp="0.9 0.95 0.001"/>
+  </default>
+
+  <asset>
+    <mesh name="bamboo_basket_mesh" file="/home/capture15/shared_data/mesh_blender/bamboo_basket/bamboo_basket.obj"/>
+    <material name="bamboo_basket_material" rgba="0.75 0.08 0.05 1"/>
+  </asset>
+
+  <worldbody>
+    <body name="bamboo_basket" pos="0 0 0">
+      <freejoint name="bamboo_basket_freejoint"/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.001 0.001 0.001"/>
+      <geom name="bamboo_basket_geom"
+            type="mesh"
+            mesh="bamboo_basket_mesh"
+            material="bamboo_basket_material"
+            contype="1"
+            conaffinity="1"/>
+    </body>
+  </worldbody>
+</mujoco>

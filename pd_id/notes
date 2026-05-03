@@ -1,0 +1,3 @@
+pd identification optimization notes
+- model_1 vs model_2 : 각 링크 질량 update
+- model_2 첫번째 run에서는 첫 10 timestep은 warmup으로 두고 제외함

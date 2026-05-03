@@ -1,0 +1,9 @@
+wandb/
+robot/
+
+__pycache__/
+
+*.txt
+
+pd_id_results/validation/
+pd_id/__pycache__/

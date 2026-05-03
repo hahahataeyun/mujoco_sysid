@@ -1,17 +1,366 @@
 <mujoco model="blue_vase">
-  <compiler angle="radian" autolimits="true" />
   <default>
-    <geom condim="3" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001" />
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" priority="1" condim="4" friction="1.2 0.01 0.001" solref="0.02 1" solimp="0.9 0.95 0.001"/>
+    </default>
   </default>
   <asset>
-    <mesh name="blue_vase_mesh" file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase.obj" />
-    <material name="blue_vase_material" rgba="0.75 0.08 0.05 1" />
+    <texture type="2d" name="blue_vase_0" file="blue_vase_0.png"/>
+    <material name="blue_vase_0" texture="blue_vase_0" specular="0.0" shininess="0.5"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_0.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_1.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_2.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_3.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_4.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_5.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_6.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_7.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_8.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_9.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_10.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_11.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_12.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_13.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_14.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_15.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_16.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_17.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_18.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_19.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_20.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_21.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_22.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_23.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_24.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_25.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_26.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_27.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_28.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_29.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_30.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_31.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_32.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_33.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_34.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_35.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_36.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_37.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_38.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_39.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_40.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_41.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_42.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_43.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_44.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_45.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_46.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_47.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_48.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_49.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_50.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_51.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_52.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_53.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_54.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_55.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_56.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_57.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_58.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_59.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_60.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_61.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_62.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_63.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_64.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_65.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_66.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_67.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_68.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_69.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_70.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_71.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_72.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_73.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_74.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_75.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_76.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_77.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_78.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_79.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_80.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_81.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_82.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_83.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_84.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_85.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_86.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_87.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_88.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_89.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_90.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_91.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_92.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_93.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_94.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_95.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_96.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_97.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_98.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_99.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_100.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_101.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_102.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_103.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_104.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_105.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_106.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_107.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_108.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_109.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_110.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_111.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_112.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_113.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_114.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_115.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_116.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_117.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_118.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_119.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_120.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_121.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_122.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_123.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_124.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_125.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_126.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_127.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_128.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_129.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_130.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_131.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_132.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_133.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_134.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_135.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_136.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_137.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_138.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_139.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_140.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_141.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_142.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_143.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_144.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_145.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_146.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_147.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_148.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_149.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_150.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_151.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_152.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_153.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_154.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_155.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_156.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_157.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_158.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_159.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_160.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_161.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_162.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_163.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_164.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_165.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_166.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_167.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_168.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_169.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_170.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_171.obj"/>
+    <mesh file="/home/capture15/shared_data/mesh_blender/blue_vase/blue_vase/blue_vase_collision_172.obj"/>
   </asset>
   <worldbody>
-    <body name="blue_vase" pos="0 0 0">
-      <freejoint name="blue_vase_freejoint" />
-      <inertial pos="0 0 0" mass="0.279" diaginertia="0.001 0.001 0.001" />
-      <geom name="blue_vase_geom" type="mesh" mesh="blue_vase_mesh" material="blue_vase_material" contype="1" conaffinity="1" />
+    <body name="blue_vase">
+      <geom material="blue_vase_0" mesh="blue_vase" class="visual"/>
+      <geom mesh="blue_vase_collision_0" rgba="0.9183152431968571 0.8668942984241432 0.4685609064951749 1" class="collision"/>
+      <geom mesh="blue_vase_collision_1" rgba="0.06488801319198645 0.6046388086284796 0.41655199124998854 1" class="collision"/>
+      <geom mesh="blue_vase_collision_2" rgba="0.36110429910479014 0.5831270904990149 0.7850663561192545 1" class="collision"/>
+      <geom mesh="blue_vase_collision_3" rgba="0.923696672099648 0.4465101089110274 0.19697969472435395 1" class="collision"/>
+      <geom mesh="blue_vase_collision_4" rgba="0.9635739914921848 0.8750396981013241 0.03709066933983507 1" class="collision"/>
+      <geom mesh="blue_vase_collision_5" rgba="0.5588191912579362 0.9249851774176455 0.6367319249512742 1" class="collision"/>
+      <geom mesh="blue_vase_collision_6" rgba="0.9539764867323561 0.5378723664646401 0.6645576202033243 1" class="collision"/>
+      <geom mesh="blue_vase_collision_7" rgba="0.7536094112423283 0.47502985998057445 0.3112017521304824 1" class="collision"/>
+      <geom mesh="blue_vase_collision_8" rgba="0.5731339019963172 0.11018280510872658 0.7848718624619369 1" class="collision"/>
+      <geom mesh="blue_vase_collision_9" rgba="0.7054668308673022 0.5769724314878134 0.5135021422025499 1" class="collision"/>
+      <geom mesh="blue_vase_collision_10" rgba="0.4148482164131414 0.40254274959949465 0.5650839894814653 1" class="collision"/>
+      <geom mesh="blue_vase_collision_11" rgba="0.24707362758266826 0.8947720803189266 0.899879022057952 1" class="collision"/>
+      <geom mesh="blue_vase_collision_12" rgba="0.9516820558233129 0.11411513323404443 0.9060739086202207 1" class="collision"/>
+      <geom mesh="blue_vase_collision_13" rgba="0.946651491025277 0.8738787584268544 0.28602995613861026 1" class="collision"/>
+      <geom mesh="blue_vase_collision_14" rgba="0.2041234630152834 0.8103529682599184 0.9532449200780497 1" class="collision"/>
+      <geom mesh="blue_vase_collision_15" rgba="0.15896384871022906 0.501018685711613 0.11593005443258908 1" class="collision"/>
+      <geom mesh="blue_vase_collision_16" rgba="0.7873347690521907 0.7203092832942052 0.8104156730821322 1" class="collision"/>
+      <geom mesh="blue_vase_collision_17" rgba="0.9882432639736211 0.9916570430456821 0.35695189748138223 1" class="collision"/>
+      <geom mesh="blue_vase_collision_18" rgba="0.874267141021486 0.6159179156379805 0.07243181896050532 1" class="collision"/>
+      <geom mesh="blue_vase_collision_19" rgba="0.4121471756943186 0.8916978864725492 0.758451605231037 1" class="collision"/>
+      <geom mesh="blue_vase_collision_20" rgba="0.7068394321820466 0.2842128175738883 0.49516167036833847 1" class="collision"/>
+      <geom mesh="blue_vase_collision_21" rgba="0.5879137668420981 0.5644200825167347 0.280238386627809 1" class="collision"/>
+      <geom mesh="blue_vase_collision_22" rgba="0.18601426634187346 0.25869185124366056 0.10410252300909517 1" class="collision"/>
+      <geom mesh="blue_vase_collision_23" rgba="0.6045262077633529 0.9548306686839979 0.140436708090253 1" class="collision"/>
+      <geom mesh="blue_vase_collision_24" rgba="0.9091286197337832 0.3893574226026477 0.42596654223403074 1" class="collision"/>
+      <geom mesh="blue_vase_collision_25" rgba="0.06256893034295419 0.4480092338494275 0.2183781203636701 1" class="collision"/>
+      <geom mesh="blue_vase_collision_26" rgba="0.830367277617335 0.08471970315594601 0.723679816935343 1" class="collision"/>
+      <geom mesh="blue_vase_collision_27" rgba="0.2751864507886591 0.3233932125323059 0.9632964385321583 1" class="collision"/>
+      <geom mesh="blue_vase_collision_28" rgba="0.8027163726454472 0.9156977137601584 0.3205165580753754 1" class="collision"/>
+      <geom mesh="blue_vase_collision_29" rgba="0.8745253930179376 0.5542194567727569 0.14300253798586582 1" class="collision"/>
+      <geom mesh="blue_vase_collision_30" rgba="0.0677094407857377 0.39505858964745255 0.21857855285210703 1" class="collision"/>
+      <geom mesh="blue_vase_collision_31" rgba="0.7288240135484536 0.05800454853255821 0.9926008437202032 1" class="collision"/>
+      <geom mesh="blue_vase_collision_32" rgba="0.1778877394197288 0.793422301024428 0.5191161945069078 1" class="collision"/>
+      <geom mesh="blue_vase_collision_33" rgba="0.3543807079779887 0.8040292346708748 0.43086043978202304 1" class="collision"/>
+      <geom mesh="blue_vase_collision_34" rgba="0.2369949305136001 0.5545276776053263 0.46843313245347784 1" class="collision"/>
+      <geom mesh="blue_vase_collision_35" rgba="0.9713348606266099 0.6720928800965736 0.5637255422923568 1" class="collision"/>
+      <geom mesh="blue_vase_collision_36" rgba="0.6456493617494835 0.15428783611281982 0.6016963307633952 1" class="collision"/>
+      <geom mesh="blue_vase_collision_37" rgba="0.20990422589610025 0.5843973615244 0.4074463184732272 1" class="collision"/>
+      <geom mesh="blue_vase_collision_38" rgba="0.859708236217251 0.07679681183341269 0.6247637137226928 1" class="collision"/>
+      <geom mesh="blue_vase_collision_39" rgba="0.5151623377859764 0.7864812018709495 0.19425515341937682 1" class="collision"/>
+      <geom mesh="blue_vase_collision_40" rgba="0.7610387999545525 0.6593339481765128 0.8473159897500915 1" class="collision"/>
+      <geom mesh="blue_vase_collision_41" rgba="0.972095078601665 0.25991840037250935 0.9774374512900927 1" class="collision"/>
+      <geom mesh="blue_vase_collision_42" rgba="0.08615737985756633 0.06006584566629802 0.38773314359165767 1" class="collision"/>
+      <geom mesh="blue_vase_collision_43" rgba="0.21933442618246035 0.4855764910209267 0.4725479653675747 1" class="collision"/>
+      <geom mesh="blue_vase_collision_44" rgba="0.11898101642800862 0.3663843186839202 0.37558847903590553 1" class="collision"/>
+      <geom mesh="blue_vase_collision_45" rgba="0.618967145221842 0.31320601391859104 0.11885604146549411 1" class="collision"/>
+      <geom mesh="blue_vase_collision_46" rgba="0.32058913908589026 0.48594284318475744 0.40498919056851057 1" class="collision"/>
+      <geom mesh="blue_vase_collision_47" rgba="0.36305605815474706 0.5422462591693187 0.64949799264157 1" class="collision"/>
+      <geom mesh="blue_vase_collision_48" rgba="0.539814888492811 0.4528834920660988 0.902514232932476 1" class="collision"/>
+      <geom mesh="blue_vase_collision_49" rgba="0.9518049108570845 0.6166678123201272 0.24209019637850504 1" class="collision"/>
+      <geom mesh="blue_vase_collision_50" rgba="0.03982089045266668 0.6042912586753044 0.17228831662653443 1" class="collision"/>
+      <geom mesh="blue_vase_collision_51" rgba="0.5961168530530682 0.4931137710458612 0.5821001968310907 1" class="collision"/>
+      <geom mesh="blue_vase_collision_52" rgba="0.39758211358718587 0.8612475444867703 0.5632370881499281 1" class="collision"/>
+      <geom mesh="blue_vase_collision_53" rgba="0.14955066817881968 0.6334774877324203 0.09624923665979301 1" class="collision"/>
+      <geom mesh="blue_vase_collision_54" rgba="0.8824502327257606 0.47080298762437345 0.4150149252702171 1" class="collision"/>
+      <geom mesh="blue_vase_collision_55" rgba="0.9896722790403716 0.09130699774173079 0.12352649176891806 1" class="collision"/>
+      <geom mesh="blue_vase_collision_56" rgba="0.4751626320838648 0.5746550232250021 0.9668007527269624 1" class="collision"/>
+      <geom mesh="blue_vase_collision_57" rgba="0.8267471552844301 0.819108214389935 0.01938249660376068 1" class="collision"/>
+      <geom mesh="blue_vase_collision_58" rgba="0.7673790751469627 0.2895091333210893 0.1993080103510252 1" class="collision"/>
+      <geom mesh="blue_vase_collision_59" rgba="0.46769280785883494 0.04114641361366944 0.3675228544800664 1" class="collision"/>
+      <geom mesh="blue_vase_collision_60" rgba="0.10257839658584322 0.0814796515356726 0.22650261548189354 1" class="collision"/>
+      <geom mesh="blue_vase_collision_61" rgba="0.44591206135838346 0.7915306168612614 0.053694330686415825 1" class="collision"/>
+      <geom mesh="blue_vase_collision_62" rgba="0.5056229578905038 0.14615729353147522 0.8594544601825759 1" class="collision"/>
+      <geom mesh="blue_vase_collision_63" rgba="0.6081040484461038 0.3143266244057682 0.13811421144358704 1" class="collision"/>
+      <geom mesh="blue_vase_collision_64" rgba="0.29853663054752333 0.696112265799676 0.32899625769430607 1" class="collision"/>
+      <geom mesh="blue_vase_collision_65" rgba="0.5848109195340612 0.22472633187160895 0.5005631740853131 1" class="collision"/>
+      <geom mesh="blue_vase_collision_66" rgba="0.3567016389200329 0.4872757689096434 0.45454854042656756 1" class="collision"/>
+      <geom mesh="blue_vase_collision_67" rgba="0.39177162238299423 0.3344526531033978 0.28420263641217647 1" class="collision"/>
+      <geom mesh="blue_vase_collision_68" rgba="0.8660861239280386 0.7423657128639553 0.06175344369238678 1" class="collision"/>
+      <geom mesh="blue_vase_collision_69" rgba="0.2592766775299412 0.5124488885827976 0.573233598653627 1" class="collision"/>
+      <geom mesh="blue_vase_collision_70" rgba="0.7391741741503186 0.7157942902614298 0.9574429881034362 1" class="collision"/>
+      <geom mesh="blue_vase_collision_71" rgba="0.49926906149629646 0.10513134728604667 0.5718620978664494 1" class="collision"/>
+      <geom mesh="blue_vase_collision_72" rgba="0.9194054312687859 0.5854398985259892 0.5461483499720786 1" class="collision"/>
+      <geom mesh="blue_vase_collision_73" rgba="0.5378282937514522 0.2079313706365108 0.8773244178402508 1" class="collision"/>
+      <geom mesh="blue_vase_collision_74" rgba="0.6782443548247259 0.9442720021520421 0.21014240627867098 1" class="collision"/>
+      <geom mesh="blue_vase_collision_75" rgba="0.35348774131327854 0.14518312500422492 0.20083428106002166 1" class="collision"/>
+      <geom mesh="blue_vase_collision_76" rgba="0.6746226921772348 0.7694461515697696 0.10720768866906605 1" class="collision"/>
+      <geom mesh="blue_vase_collision_77" rgba="0.5385230278227817 0.24210249915469773 0.6602464795619329 1" class="collision"/>
+      <geom mesh="blue_vase_collision_78" rgba="0.1391364998289626 0.7639125698574695 0.4801169739512715 1" class="collision"/>
+      <geom mesh="blue_vase_collision_79" rgba="0.7239845498344765 0.7924645467902282 0.7802636225309739 1" class="collision"/>
+      <geom mesh="blue_vase_collision_80" rgba="0.34094345022056616 0.6140981661701826 0.31683377270633395 1" class="collision"/>
+      <geom mesh="blue_vase_collision_81" rgba="0.2588034757545218 0.08751654464468539 0.07348607615149472 1" class="collision"/>
+      <geom mesh="blue_vase_collision_82" rgba="0.8343313746340216 0.37154345946904843 0.060315013902990655 1" class="collision"/>
+      <geom mesh="blue_vase_collision_83" rgba="0.6807569395208313 0.35243296121205725 0.3611363490857433 1" class="collision"/>
+      <geom mesh="blue_vase_collision_84" rgba="0.7898412952351138 0.43144306120513565 0.38667113317155655 1" class="collision"/>
+      <geom mesh="blue_vase_collision_85" rgba="0.586238671499347 0.9842417698104589 0.8523483401674198 1" class="collision"/>
+      <geom mesh="blue_vase_collision_86" rgba="0.7055134829955155 0.3315529217728814 0.08569223190113384 1" class="collision"/>
+      <geom mesh="blue_vase_collision_87" rgba="0.7398483583498622 0.1495448543906347 0.5032859308823471 1" class="collision"/>
+      <geom mesh="blue_vase_collision_88" rgba="0.5988101608000957 0.2341762146797256 0.8225729251985756 1" class="collision"/>
+      <geom mesh="blue_vase_collision_89" rgba="0.639666707839146 0.9855529455386314 0.9017703982846315 1" class="collision"/>
+      <geom mesh="blue_vase_collision_90" rgba="0.877043019770111 0.010366327409856102 0.2978610845410492 1" class="collision"/>
+      <geom mesh="blue_vase_collision_91" rgba="0.5682697875755871 0.31636816156180947 0.2858653898184229 1" class="collision"/>
+      <geom mesh="blue_vase_collision_92" rgba="0.023539117482794247 0.3239475869231073 0.8932249708012647 1" class="collision"/>
+      <geom mesh="blue_vase_collision_93" rgba="0.04983105606279137 0.11757992576743881 0.8136407536699524 1" class="collision"/>
+      <geom mesh="blue_vase_collision_94" rgba="0.04954375509166653 0.16444128187698137 0.40775730125830933 1" class="collision"/>
+      <geom mesh="blue_vase_collision_95" rgba="0.2706984392184779 0.4617891455851987 0.8474371970170347 1" class="collision"/>
+      <geom mesh="blue_vase_collision_96" rgba="0.493662865449655 0.9053290893400299 0.5768530861194998 1" class="collision"/>
+      <geom mesh="blue_vase_collision_97" rgba="0.03327704142629828 0.7011746949543182 0.721621151787965 1" class="collision"/>
+      <geom mesh="blue_vase_collision_98" rgba="0.45108048666791656 0.6138935877431598 0.29921991437039175 1" class="collision"/>
+      <geom mesh="blue_vase_collision_99" rgba="0.5262365579970175 0.31071121003654756 0.7185918167173062 1" class="collision"/>
+      <geom mesh="blue_vase_collision_100" rgba="0.8965372400158785 0.9097383120809308 0.7218893985153985 1" class="collision"/>
+      <geom mesh="blue_vase_collision_101" rgba="0.6304275001960857 0.23564255733578654 0.8909691101833361 1" class="collision"/>
+      <geom mesh="blue_vase_collision_102" rgba="0.9139758944576905 0.3585756300473717 0.781929758105971 1" class="collision"/>
+      <geom mesh="blue_vase_collision_103" rgba="0.04849045748109715 0.980108001865656 0.5948702867323115 1" class="collision"/>
+      <geom mesh="blue_vase_collision_104" rgba="0.7295884868028465 0.8123525467489502 0.8294644425156172 1" class="collision"/>
+      <geom mesh="blue_vase_collision_105" rgba="0.06459693735316074 0.7716831773801591 0.6257607766653923 1" class="collision"/>
+      <geom mesh="blue_vase_collision_106" rgba="0.4374239776890775 0.6244545750484228 0.34828597134244765 1" class="collision"/>
+      <geom mesh="blue_vase_collision_107" rgba="0.5235110928349449 0.1491116323399898 0.43523703667068925 1" class="collision"/>
+      <geom mesh="blue_vase_collision_108" rgba="0.5775952912318792 0.2416463831845348 0.19491685806940495 1" class="collision"/>
+      <geom mesh="blue_vase_collision_109" rgba="0.596958106543686 0.8460892223068229 0.48536132017377875 1" class="collision"/>
+      <geom mesh="blue_vase_collision_110" rgba="0.8567780997597731 0.8368439763158613 0.11614393414060564 1" class="collision"/>
+      <geom mesh="blue_vase_collision_111" rgba="0.8678201069190129 0.3195999673053801 0.20892966026092497 1" class="collision"/>
+      <geom mesh="blue_vase_collision_112" rgba="0.262298470907917 0.6651088575310506 0.7638358630987938 1" class="collision"/>
+      <geom mesh="blue_vase_collision_113" rgba="0.9781450128518632 0.16457170327616455 0.06899649596315427 1" class="collision"/>
+      <geom mesh="blue_vase_collision_114" rgba="0.3940390992428694 0.16441081047748063 0.7766475508093809 1" class="collision"/>
+      <geom mesh="blue_vase_collision_115" rgba="0.04199892069413891 0.17900403421302713 0.48728826839049644 1" class="collision"/>
+      <geom mesh="blue_vase_collision_116" rgba="0.2617465327409454 0.8937142716396075 0.183419784095465 1" class="collision"/>
+      <geom mesh="blue_vase_collision_117" rgba="0.6237227638163029 0.7439250681257898 0.40966846818316116 1" class="collision"/>
+      <geom mesh="blue_vase_collision_118" rgba="0.04426645177209898 0.731147359403608 0.7791893546533557 1" class="collision"/>
+      <geom mesh="blue_vase_collision_119" rgba="0.5408420845208259 0.9300282838180257 0.984829822305789 1" class="collision"/>
+      <geom mesh="blue_vase_collision_120" rgba="0.909962222916251 0.613302139179934 0.5121573805590288 1" class="collision"/>
+      <geom mesh="blue_vase_collision_121" rgba="0.3701281467006329 0.15627584114458182 0.15485292700515585 1" class="collision"/>
+      <geom mesh="blue_vase_collision_122" rgba="0.8790033764140279 0.10147221876613255 0.8859947953977354 1" class="collision"/>
+      <geom mesh="blue_vase_collision_123" rgba="0.7189778767789206 0.03069357789236682 0.8250819951289255 1" class="collision"/>
+      <geom mesh="blue_vase_collision_124" rgba="0.143992800947653 0.823086273632132 0.03963005173673162 1" class="collision"/>
+      <geom mesh="blue_vase_collision_125" rgba="0.8217372906784657 0.6125101032427791 0.37786493483143224 1" class="collision"/>
+      <geom mesh="blue_vase_collision_126" rgba="0.45072888292278757 0.7313075644291382 0.7229080519660913 1" class="collision"/>
+      <geom mesh="blue_vase_collision_127" rgba="0.8560916550003103 0.2612568034480155 0.5245227667450083 1" class="collision"/>
+      <geom mesh="blue_vase_collision_128" rgba="0.5181856957283671 0.1610485634580492 0.8881497844071929 1" class="collision"/>
+      <geom mesh="blue_vase_collision_129" rgba="0.2600000146280178 0.7925956869726286 0.08546827923386968 1" class="collision"/>
+      <geom mesh="blue_vase_collision_130" rgba="0.4744274422804867 0.837580284203121 0.37750094491153285 1" class="collision"/>
+      <geom mesh="blue_vase_collision_131" rgba="0.10669387808956987 0.35466788228358137 0.46206803655039597 1" class="collision"/>
+      <geom mesh="blue_vase_collision_132" rgba="0.09313316020775386 0.3523667619500779 0.3396417552930926 1" class="collision"/>
+      <geom mesh="blue_vase_collision_133" rgba="0.27733662809324944 0.371400706895314 0.93009157621879 1" class="collision"/>
+      <geom mesh="blue_vase_collision_134" rgba="0.09921030566316658 0.9296114033394431 0.9089827762312924 1" class="collision"/>
+      <geom mesh="blue_vase_collision_135" rgba="0.09378438187366844 0.37727799005913365 0.5191762589454632 1" class="collision"/>
+      <geom mesh="blue_vase_collision_136" rgba="0.7028128277010426 0.835730783975858 0.962882701447073 1" class="collision"/>
+      <geom mesh="blue_vase_collision_137" rgba="0.6095117798863481 0.2603125284366039 0.36418812696917335 1" class="collision"/>
+      <geom mesh="blue_vase_collision_138" rgba="0.20046908070834613 0.23929943422629518 0.9926203668759263 1" class="collision"/>
+      <geom mesh="blue_vase_collision_139" rgba="0.2796199227331311 0.23349710346488173 0.49767418941784347 1" class="collision"/>
+      <geom mesh="blue_vase_collision_140" rgba="0.9215468240096697 0.1571532924717035 0.48114266053875654 1" class="collision"/>
+      <geom mesh="blue_vase_collision_141" rgba="0.15579159227645256 0.1397676431259619 0.2936484716079719 1" class="collision"/>
+      <geom mesh="blue_vase_collision_142" rgba="0.813755711033291 0.9491276128269076 0.8697409825272402 1" class="collision"/>
+      <geom mesh="blue_vase_collision_143" rgba="0.39063148939851466 0.13880811007295324 0.43632814611060056 1" class="collision"/>
+      <geom mesh="blue_vase_collision_144" rgba="0.6187741657972261 0.9387090059500344 0.7128208499193339 1" class="collision"/>
+      <geom mesh="blue_vase_collision_145" rgba="0.2102330194258445 0.9829575570354935 0.8124441293216677 1" class="collision"/>
+      <geom mesh="blue_vase_collision_146" rgba="0.1942330451267188 0.39465204982274993 0.03321171133863943 1" class="collision"/>
+      <geom mesh="blue_vase_collision_147" rgba="0.3904126441317388 0.7830966014084545 0.4923471151897155 1" class="collision"/>
+      <geom mesh="blue_vase_collision_148" rgba="0.09273139432215405 0.296952215650935 0.7899319911526581 1" class="collision"/>
+      <geom mesh="blue_vase_collision_149" rgba="0.7175647148240234 0.39386040058731786 0.3005349853859175 1" class="collision"/>
+      <geom mesh="blue_vase_collision_150" rgba="0.2557017688964771 0.6160738689404779 0.4850919531374118 1" class="collision"/>
+      <geom mesh="blue_vase_collision_151" rgba="0.6687521433850467 0.14767528951819942 0.11474918801193257 1" class="collision"/>
+      <geom mesh="blue_vase_collision_152" rgba="0.20692270942711788 0.12999026251013457 0.2368680604278045 1" class="collision"/>
+      <geom mesh="blue_vase_collision_153" rgba="0.6155873624698986 0.703646192926601 0.154913668163718 1" class="collision"/>
+      <geom mesh="blue_vase_collision_154" rgba="0.9692678601387376 0.8441256128899857 0.1889368891482589 1" class="collision"/>
+      <geom mesh="blue_vase_collision_155" rgba="0.8542939686142398 0.10305457128344575 0.3075953366250429 1" class="collision"/>
+      <geom mesh="blue_vase_collision_156" rgba="0.8898198462907927 0.9371511984973154 0.6013713934556684 1" class="collision"/>
+      <geom mesh="blue_vase_collision_157" rgba="0.8755425217226973 0.2983445145621362 0.030461917823538465 1" class="collision"/>
+      <geom mesh="blue_vase_collision_158" rgba="0.15641946190252365 0.13800332033848606 0.5504988958732517 1" class="collision"/>
+      <geom mesh="blue_vase_collision_159" rgba="0.3502093699175127 0.9960018463069037 0.6928604022780821 1" class="collision"/>
+      <geom mesh="blue_vase_collision_160" rgba="0.8823689812698194 0.2898553878538417 0.07865995175958096 1" class="collision"/>
+      <geom mesh="blue_vase_collision_161" rgba="0.4034903870504388 0.9214941337710388 0.6632545920521951 1" class="collision"/>
+      <geom mesh="blue_vase_collision_162" rgba="0.8448986179725796 0.35250692314246235 0.9951387162319614 1" class="collision"/>
+      <geom mesh="blue_vase_collision_163" rgba="0.7135099263778082 0.16536791116888405 0.15201633980734908 1" class="collision"/>
+      <geom mesh="blue_vase_collision_164" rgba="0.16625477477057393 0.7628747454692655 0.14078918286915065 1" class="collision"/>
+      <geom mesh="blue_vase_collision_165" rgba="0.20549023015832746 0.4556221391674711 0.9061308959435491 1" class="collision"/>
+      <geom mesh="blue_vase_collision_166" rgba="0.7643915877459371 0.9585544278034603 0.4991287232249977 1" class="collision"/>
+      <geom mesh="blue_vase_collision_167" rgba="0.5233726859229599 0.6890608562772652 0.6919190862914262 1" class="collision"/>
+      <geom mesh="blue_vase_collision_168" rgba="0.47756151642917777 0.4958282952980363 0.42497024382695536 1" class="collision"/>
+      <geom mesh="blue_vase_collision_169" rgba="0.6141892987773936 0.897973819875395 0.229604424243119 1" class="collision"/>
+      <geom mesh="blue_vase_collision_170" rgba="0.33834444625413074 0.06578483491735632 0.37124495330681606 1" class="collision"/>
+      <geom mesh="blue_vase_collision_171" rgba="0.4994417681502842 0.4412808977804379 0.4240346326299792 1" class="collision"/>
+      <geom mesh="blue_vase_collision_172" rgba="0.1350433790317077 0.23778522839731486 0.28097380318020215 1" class="collision"/>
     </body>
   </worldbody>
 </mujoco>

@@ -2,12 +2,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import tempfile
 import xml.etree.ElementTree as ET
 
 import numpy as np
 
 
 ARM_JOINTS = tuple(f"joint{i}" for i in range(1, 7))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MESH_ROOTS = (
+    REPO_ROOT / "pd_id/initial_mjcf",
+    REPO_ROOT / "rsc/robot",
+    REPO_ROOT / "rsc/curobo/content/assets/robot/inspire_description",
+)
 
 
 @dataclass(frozen=True)
@@ -40,12 +47,58 @@ def require_mujoco():
     return mujoco
 
 
-def load_mujoco_model(xml_path: Path):
+def _resolve_asset_file(file_name: str, xml_dir: Path, asset_roots: tuple[Path, ...]) -> Path:
+    path = Path(file_name)
+    if path.is_absolute():
+        return path
+
+    candidates = [xml_dir / path]
+    candidates.extend(root / path for root in asset_roots)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return path
+
+
+def _xml_with_resolved_assets(xml_path: Path, asset_roots: tuple[Path, ...]) -> str:
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    changed = False
+    xml_dir = xml_path.parent
+
+    for elem in root.findall(".//*[@file]"):
+        original = elem.get("file")
+        if not original:
+            continue
+        resolved = _resolve_asset_file(original, xml_dir, asset_roots)
+        if resolved != Path(original):
+            elem.set("file", str(resolved))
+            changed = True
+
+    if not changed:
+        return str(xml_path)
+
+    handle = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".mjcf", prefix=f"{xml_path.stem}_resolved_", delete=False
+    )
+    with handle:
+        tree.write(handle, encoding="unicode", xml_declaration=False)
+    return handle.name
+
+
+def load_mujoco_model(
+    xml_path: Path, *, resolve_assets: bool = True, asset_roots: tuple[Path, ...] = DEFAULT_MESH_ROOTS
+):
     mujoco = require_mujoco()
-    return mujoco.MjModel.from_xml_path(str(xml_path))
+    xml_to_load = (
+        _xml_with_resolved_assets(xml_path, asset_roots) if resolve_assets else str(xml_path)
+    )
+    return mujoco.MjModel.from_xml_path(xml_to_load)
 
 
-def arm_layout(model, joint_names: tuple[str, ...] = ARM_JOINTS) -> RobotLayout:
+def arm_layout(
+    model, joint_names: tuple[str, ...] = ARM_JOINTS, *, require_actuators: bool = True
+) -> RobotLayout:
     mujoco = require_mujoco()
     qpos_ids = []
     dof_ids = []
@@ -55,7 +108,7 @@ def arm_layout(model, joint_names: tuple[str, ...] = ARM_JOINTS) -> RobotLayout:
         if joint_id < 0:
             raise ValueError(f"joint not found in model: {name}")
         actuator_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
-        if actuator_id < 0:
+        if actuator_id < 0 and require_actuators:
             raise ValueError(f"actuator not found in model: {name}")
         qpos_ids.append(int(model.jnt_qposadr[joint_id]))
         dof_ids.append(int(model.jnt_dofadr[joint_id]))
@@ -104,6 +157,8 @@ def write_fitted_xml(
     params: dict[str, np.ndarray],
     joint_names: tuple[str, ...] = ARM_JOINTS,
     timestep: float | None = None,
+    resolve_assets: bool = True,
+    asset_roots: tuple[Path, ...] = DEFAULT_MESH_ROOTS,
 ) -> None:
     tree = ET.parse(source_xml)
     root = tree.getroot()
@@ -113,6 +168,13 @@ def write_fitted_xml(
         if option is None:
             option = ET.SubElement(root, "option")
         option.set("timestep", f"{float(timestep):.12g}")
+
+    if resolve_assets:
+        xml_dir = source_xml.parent
+        for elem in root.findall(".//*[@file]"):
+            original = elem.get("file")
+            if original:
+                elem.set("file", str(_resolve_asset_file(original, xml_dir, asset_roots)))
 
     joints = {elem.attrib.get("name"): elem for elem in root.iter("joint")}
     actuators = {elem.attrib.get("name"): elem for elem in root.iter("position")}

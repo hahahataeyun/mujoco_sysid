@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -169,3 +170,11 @@ def full_sequence_batch(dataset: ArmDataset) -> WindowBatch:
         target_tau=dataset.torque[1:][None, ...],
         mask=np.ones((1, dataset.length - 1), dtype=np.float64),
     )
+
+
+def apply_warmup_mask(batch: WindowBatch, warmup_steps: int) -> WindowBatch:
+    if warmup_steps <= 0:
+        return batch
+    mask = np.array(batch.mask, copy=True)
+    mask[:, :warmup_steps] = 0.0
+    return replace(batch, mask=mask)

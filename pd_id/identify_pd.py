@@ -1,17 +1,23 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 
 import numpy as np
 
-from pd_id.data import full_sequence_batch, load_arm_dataset, sample_fixed_window_batch
+from pd_id.data import (
+    apply_warmup_mask,
+    full_sequence_batch,
+    load_arm_dataset,
+    sample_fixed_window_batch,
+)
 from pd_id.model import initial_parameters, load_mujoco_model, arm_layout, write_fitted_xml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DATA_DIR = Path("/home/capture15/shared_data/capture/test_pd/cartesian/2/raw/arm")
+DEFAULT_DATA_DIR = Path("/home/capture15/shared_data/capture/test_pd/ik/6/raw/arm")
 DEFAULT_INITIAL_MJCF_DIR = REPO_ROOT / "pd_id/initial_mjcf"
 DEFAULT_INITIAL_MODEL = "xarm_model_0"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "pd_id_results"
@@ -33,6 +39,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--iters", type=int, default=1000)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--window-sec", type=float, default=1.0)
+    parser.add_argument(
+        "--warmup-steps",
+        type=int,
+        default=10,
+        help="Number of initial rollout steps to ignore in the training loss.",
+    )
     parser.add_argument("--lr", type=float, default=5e-3)
     parser.add_argument("--grad-mode", choices=("forward", "reverse"), default="forward")
     parser.add_argument("--seed", type=int, default=0)
@@ -42,6 +54,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--grad-clip-norm", type=float, default=100.0)
     parser.add_argument("--positive-floor", type=float, default=1e-8)
     parser.add_argument("--print-every", type=int, default=1)
+    parser.add_argument("--checkpoint-every", type=int, default=1000)
     parser.add_argument("--no-final-rollout", action="store_true")
     parser.add_argument("--wandb", action="store_true")
     parser.add_argument("--wandb-project", type=str, default="pd-id")
@@ -108,6 +121,7 @@ def _default_run_name(
         f"{robot_stem}_pd"
         f"_bs{args.batch_size}"
         f"_win{window}s-{window_steps}step"
+        f"_warm{args.warmup_steps}"
         f"_iter{args.iters}"
         f"_lr{lr}"
         f"_seed{args.seed}"
@@ -116,11 +130,66 @@ def _default_run_name(
 
 def _resolve_output_paths(
     args: argparse.Namespace, robot_xml: Path, window_steps: int
-) -> tuple[Path, Path | None, str]:
+) -> tuple[Path, Path, Path | None, str]:
     run_name = args.run_name or _default_run_name(args, robot_xml, window_steps)
-    output = args.output or (args.output_dir / f"{run_name}.npz")
-    fitted_xml = None if args.no_fitted_xml else (args.fitted_xml or args.output_dir / f"{run_name}.mjcf")
-    return output, fitted_xml, run_name
+    run_dir = args.output_dir / run_name
+    output = args.output or (run_dir / "result.npz")
+    fitted_xml = None if args.no_fitted_xml else (args.fitted_xml or run_dir / "fitted_xarm_final.mjcf")
+    return run_dir, output, fitted_xml, run_name
+
+
+def _jsonify(value):
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, dict):
+        return {key: _jsonify(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonify(item) for item in value]
+    return value
+
+
+def _write_run_config(
+    path: Path,
+    *,
+    args: argparse.Namespace,
+    run_name: str,
+    run_dir: Path,
+    robot_xml: Path,
+    output_path: Path,
+    fitted_xml_path: Path | None,
+    data_dt: float,
+    model_dt_original: float,
+    model_dt_effective: float,
+    effective_dt: float,
+    sim_substeps: int,
+    window_steps: int,
+) -> None:
+    config = {
+        "run_name": run_name,
+        "run_dir": run_dir,
+        "initial_model": robot_xml.stem,
+        "initial_mjcf": robot_xml,
+        "data_dir": args.data_dir,
+        "output": output_path,
+        "fitted_xml": fitted_xml_path,
+        "args": vars(args),
+        "derived": {
+            "data_dt": data_dt,
+            "model_dt_original": model_dt_original,
+            "model_dt_effective": model_dt_effective,
+            "effective_dt": effective_dt,
+            "sim_substeps": sim_substeps,
+            "window_steps": window_steps,
+        },
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(_jsonify(config), handle, indent=2, sort_keys=True)
+        handle.write("\n")
 
 
 def _init_wandb(
@@ -135,6 +204,7 @@ def _init_wandb(
     model_dt_effective: float,
     sim_substeps: int,
     window_steps: int,
+    warmup_steps: int,
 ):
     if not args.wandb:
         return None
@@ -156,10 +226,12 @@ def _init_wandb(
             "initial_mjcf": str(robot_xml),
             "output": str(output_path),
             "fitted_xml": None if fitted_xml_path is None else str(fitted_xml_path),
+            "checkpoint_every": args.checkpoint_every,
             "iters": args.iters,
             "batch_size": args.batch_size,
             "window_sec": args.window_sec,
             "window_steps": window_steps,
+            "warmup_steps": warmup_steps,
             "lr": args.lr,
             "grad_mode": args.grad_mode,
             "seed": args.seed,
@@ -180,8 +252,10 @@ def _save_wandb_outputs(
     wandb_run,
     *,
     run_name: str,
+    run_dir: Path,
     output_path: Path,
     fitted_xml_path: Path | None,
+    config_path: Path,
 ) -> None:
     if wandb_run is None:
         return
@@ -196,18 +270,26 @@ def _save_wandb_outputs(
         metadata={
             "result_npz": str(output_path),
             "fitted_xml": None if fitted_xml_path is None else str(fitted_xml_path),
+            "config": str(config_path),
         },
     )
+    if config_path.exists():
+        artifact.add_file(str(config_path), name=config_path.name)
     if output_path.exists():
         artifact.add_file(str(output_path), name=output_path.name)
     if fitted_xml_path is not None and fitted_xml_path.exists():
         artifact.add_file(str(fitted_xml_path), name=fitted_xml_path.name)
+    for checkpoint_path in sorted(run_dir.glob("fitted_xarm_*.mjcf")):
+        if fitted_xml_path is not None and checkpoint_path.resolve() == fitted_xml_path.resolve():
+            continue
+        artifact.add_file(str(checkpoint_path), name=checkpoint_path.name)
     wandb_run.log_artifact(artifact)
     wandb_run.config.update(
         {
             "output_artifact": artifact.name,
             "output_npz": str(output_path),
             "output_fitted_xml": None if fitted_xml_path is None else str(fitted_xml_path),
+            "output_config": str(config_path),
         },
         allow_val_change=True,
     )
@@ -237,9 +319,20 @@ def main() -> None:
     mujoco_model.opt.timestep = sim_dt
     effective_dt = sim_substeps * sim_dt
     window_steps = _steps_from_seconds(args.window_sec, dataset.dt)
-    output_path, fitted_xml_path, run_name = _resolve_output_paths(
+    if args.warmup_steps < 0:
+        raise ValueError(f"--warmup-steps must be non-negative, got {args.warmup_steps}")
+    if args.warmup_steps >= window_steps:
+        raise ValueError(
+            f"--warmup-steps ({args.warmup_steps}) must be smaller than "
+            f"window_steps ({window_steps}). Increase --window-sec or reduce warmup."
+        )
+    run_dir, output_path, fitted_xml_path, run_name = _resolve_output_paths(
         args, robot_xml, window_steps
     )
+    config_path = run_dir / "config.json"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    if args.checkpoint_every < 0:
+        raise ValueError(f"--checkpoint-every must be non-negative, got {args.checkpoint_every}")
 
     layout = arm_layout(mujoco_model)
     initial = initial_parameters(mujoco_model, layout)
@@ -254,13 +347,31 @@ def main() -> None:
     )
     print(
         f"batch_size={args.batch_size} window_sec={args.window_sec:g} "
-        f"window_steps={window_steps} "
+        f"window_steps={window_steps} warmup_steps={args.warmup_steps} "
         f"loss_weights=(pos={args.w_pos}, vel={args.w_vel}, tau={args.w_tau})"
     )
+    print(f"run_dir={run_dir}")
     print(f"output={output_path}")
+    print(f"config={config_path}")
     if fitted_xml_path is not None:
         print(f"fitted_xml={fitted_xml_path}")
     print(f"grad_mode={args.grad_mode}")
+
+    _write_run_config(
+        config_path,
+        args=args,
+        run_name=run_name,
+        run_dir=run_dir,
+        robot_xml=robot_xml,
+        output_path=output_path,
+        fitted_xml_path=fitted_xml_path,
+        data_dt=dataset.dt,
+        model_dt_original=original_sim_dt,
+        model_dt_effective=sim_dt,
+        effective_dt=effective_dt,
+        sim_substeps=sim_substeps,
+        window_steps=window_steps,
+    )
 
     wandb_run = _init_wandb(
         args,
@@ -273,6 +384,7 @@ def main() -> None:
         model_dt_effective=sim_dt,
         sim_substeps=sim_substeps,
         window_steps=window_steps,
+        warmup_steps=args.warmup_steps,
     )
 
     raw_params = init_raw_params(initial, args.positive_floor)
@@ -299,6 +411,7 @@ def main() -> None:
             steps=window_steps,
             rng=rng,
         )
+        batch = apply_warmup_mask(batch, args.warmup_steps)
         state, metrics = train_step(state, batch_to_jax(batch))
         metrics_host = _host_metrics(metrics)
         history.append(metrics_host)
@@ -316,6 +429,17 @@ def main() -> None:
                 f"pos={metrics_host['pos_loss']:.6g} vel={metrics_host['vel_loss']:.6g} "
                 f"tau={metrics_host['tau_loss']:.6g} grad={metrics_host['grad_norm']:.6g}"
             )
+        if (
+            fitted_xml_path is not None
+            and args.checkpoint_every > 0
+            and iteration % args.checkpoint_every == 0
+        ):
+            checkpoint_params = materialize_params_np(state["params"], args.positive_floor)
+            checkpoint_path = run_dir / f"fitted_xarm_{iteration}.mjcf"
+            write_fitted_xml(
+                robot_xml, checkpoint_path, params=checkpoint_params, timestep=sim_dt
+            )
+            print(f"saved checkpoint xml: {checkpoint_path}")
 
     final_params = materialize_params_np(state["params"], args.positive_floor)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -341,13 +465,17 @@ def main() -> None:
         "robot_xml": np.asarray(str(robot_xml)),
         "initial_mjcf": np.asarray(str(robot_xml)),
         "initial_model": np.asarray(robot_xml.stem),
+        "run_dir": np.asarray(str(run_dir)),
+        "config_path": np.asarray(str(config_path)),
         "sim_substeps": np.asarray(sim_substeps),
         "data_dt": np.asarray(dataset.dt),
         "model_dt_original": np.asarray(original_sim_dt),
         "model_dt": np.asarray(sim_dt),
         "window_sec": np.asarray(args.window_sec),
         "window_steps": np.asarray(window_steps),
+        "warmup_steps": np.asarray(args.warmup_steps),
         "batch_size": np.asarray(args.batch_size),
+        "checkpoint_every": np.asarray(args.checkpoint_every),
         "iters": np.asarray(args.iters),
         "seed": np.asarray(args.seed),
         "run_name": np.asarray(run_name),
@@ -400,8 +528,10 @@ def main() -> None:
     _save_wandb_outputs(
         wandb_run,
         run_name=run_name,
+        run_dir=run_dir,
         output_path=output_path,
         fitted_xml_path=fitted_xml_path,
+        config_path=config_path,
     )
 
     for key, value in final_params.items():
